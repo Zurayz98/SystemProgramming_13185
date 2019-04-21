@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <stdbool.h>
+
+int num;
+
+
+//ADDITION
+float addition(char *str){
+
+        float substr = 0;
+        float sum = 0;
+        while(str != NULL){
+        substr = atof(str);
+        sum += substr;
+        str = strtok(NULL," ");
+        }
+        return sum;
+}
+//SUBTRACTION
+float subtract(char *str){
+        float substr = 0;
+        float res = atof(str);
+        str = strtok(NULL," ");
+        while(str != NULL){
+        substr = atof(str);
+        res -= substr;
+        str = strtok(NULL," ");
+        }
+        return res;
+}
+//MULTIPLICATION
+float multiply(char *str){
+        float substr = 0;
+        float res = 1;
+        while(str != NULL){
+        substr = atoi(str);
+        res = res*substr;
+        str = strtok(NULL," ");
+        }
+        return res;
+}
+//DIVISION
+float divide(char *str){
+        float substr = 0;
+        float res = atof(str);
+        str = strtok(NULL," ");
+        while(str != NULL){
+        substr = atof(str);
+        res = res/substr;
+        str = strtok(NULL," ");
+        }
+        return res;
+}
+//RUN PROGRAM
+void run(char *str){
+    //REMOVING ENTER FROM THE GIVEN STRING
+    if(str[strlen(str)-1] == '\n'){
+        str[strlen(str)-1] = '\0';
+    }
+
+        int pid = fork();
+
+    if(pid==-1){
+        perror("Error at fork: ");
+        exit(1);
+    }
+    else if(pid == 0){
+    
+            int ret=0;
+            char * args[] = {str,NULL};
+            ret = execvp(str, args);
+        if (ret == -1) {
+            perror("Error at exec: ");
+            exit(1);
+        }
+        else{
+        
+        }
+    }
+}
+//PROCESS LIST STRUCTURE
+typedef struct processlist{
+        char *procName;
+        int proc_id;
+        time_t startTime;
+        time_t endTime;
+        bool isActive;
+}proc_list;
+
+struct processlist plist[10];
+
+int main()
+{  
+        float result=0;
+        char user_input[500] = " ";
+        num = write(STDOUT_FILENO,"Command: ",9);
+    if(num<0){
+        perror("Error at write: ");
+        exit(1);
+    }
+        num = read(STDIN_FILENO, user_input, sizeof(user_input));
+    if(num<0){
+        perror("Error at input: ");
+        exit(1);
+    }
+
+        char *tok = NULL;
+        tok = strtok(user_input, " "); //HAS THE INITIAL COMMAND
+
+
+if(strcmp(tok, "add")==0){
+        tok = strtok(NULL, " ");
+        result = addition(tok);
+        int input_length = sprintf(user_input,"%.2f",result);
+        write(STDOUT_FILENO, "Result: ", 8);
+        write(STDOUT_FILENO,user_input,input_length);
+    }
+if(strcmp(tok, "sub")==0){
+        tok = strtok(NULL, " ");
+        result =subtract(tok);
+        int input_length = sprintf(user_input,"%.2f",result);
+        write(STDOUT_FILENO, "Result: ", 8);
+        write(STDOUT_FILENO,user_input,input_length);    
+    }
+if(strcmp(tok, "mul")==0){
+        tok = strtok(NULL, " ");
+        result = multiply(tok);
+        int input_length = sprintf(user_input,"%.2f",result);
+        write(STDOUT_FILENO, "Result: ", 8);
+        write(STDOUT_FILENO,user_input,input_length);    
+    }
+if(strcmp(tok, "div")==0){
+        tok = strtok(NULL, " ");
+        result = divide(tok);
+        int input_length = sprintf(user_input,"%.2f",result);
+        write(STDOUT_FILENO, "Result: ", 8);
+        write(STDOUT_FILENO,user_input,input_length);    
+    }
+if(strcmp(tok, "run")==0){
+        tok = strtok(NULL, " ");
+        run(tok);
+
+}
+if(strcmp(tok, "exit")){
+        exit(1);
+}
+}
