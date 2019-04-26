@@ -39,6 +39,16 @@ typedef struct processlist{
 
 struct processlist plist[MAX_LIMIT];
 int plist_index=0;
+//SIGNAL HANDLER
+void sighandler(int signo) {
+    if (signo == SIGINT) {
+    write(STDOUT_FILENO, "\nYou pressed CTRL-C!\n", sizeof("\nYou pressed CTRL-C!\n"));
+}
+       if (signo == SIGCHLD) {
+    write(STDOUT_FILENO, "\nChild is terminated\n", sizeof("\nChild is terminated\n"));
+}
+
+}
 
 //ADDITION
 float addition(char *str){
@@ -203,13 +213,16 @@ else if(strcmp(tok, "run")==0){
         int len = sprintf(buffer, "Program Executed");
         n = write(sock, buffer, len);
 }
-else if(strcmp(tok, "list")==0){//FIX IT -- DO THIS ON CLIENT END
+else if(strcmp(tok, "list")==0){
         char buff[MAX_LIMIT];
-        int num;
+        int num=0;
+        int total_len=0;
+        n=0;
         //int n = sprintf(buffer, "Total number of processes: %d\n", plist_index);
         //write(sock, buffer, n);
         n = sprintf(buffer, "\nName\tpid\tisActive\tStart Time\tEnd Time\n");
         //write(sock, buffer, n);
+        total_len =n+num;
         for(int i=0; i<plist_index; i++){
         char stime[9];
         char etime[9];
@@ -217,9 +230,9 @@ else if(strcmp(tok, "list")==0){//FIX IT -- DO THIS ON CLIENT END
         strftime(etime, 9, "%X", gmtime(&plist[i].endTime));
         num = sprintf(buff, "%s\t%d\t%d\t\t%s\t%s\n",plist[i].procName, plist[i].proc_id, plist[i].isActive, stime, etime);
         strcat(buffer, buff);
-
-        write(sock, buffer, n+num);
+        total_len+=num;
         }
+        write(sock, buffer, total_len);
 }
 else if(strcmp(tok, "exit")==0){
         write(STDOUT_FILENO, "Client left", 11);
@@ -252,8 +265,10 @@ else if(strcmp(tok, "kill")==0){
         }
         for(int i=0; i<plist_index; i++){
                 if(plist[i].proc_id == kpid){
-                        plist[i].isActive=false;
+
                         time(&plist[plist_index].endTime);
+                        plist[i].isActive=false;
+                        
                 }
         }
         n = sprintf(buff, "Process with pid: %d killed successfully", kpid);
@@ -269,7 +284,9 @@ else{
 }
 
 int main()
-{
+{       char help[MAX_LIMIT];
+        int x = sprintf(help, "Available instructions:\n1. add\n2. sub\n 3. mul\n4. div\n5. run\n6. list\n 7. exit \n");
+        write(STDOUT_FILENO,help,x);
         char buff[MAX_LIMIT];
         int pid;
         char *tok = NULL;
