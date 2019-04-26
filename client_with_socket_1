@@ -48,12 +48,12 @@ char buffer[256];
          server->h_length);
     serv_addr.sin_port = htons(portno);
     if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
-        perror("ERROR connecting");
+        {perror("ERROR connecting");}
 
-
-        printf("Please enter the message: ");
-    bzero(buffer,256);
-    fgets(buffer,255,stdin);
+          while(1){
+        write(STDOUT_FILENO, "Please enter the message: ", sizeof("Please enter the message: "));
+     bzero(buffer,256);
+    read(STDIN_FILENO,buffer,255);
     if(strcmp(buffer,"exit")==0){
          write(STDOUT_FILENO, "Exiting...", 10);
          exit(0);
@@ -66,7 +66,8 @@ char buffer[256];
     if (n < 0) 
          perror("ERROR reading from socket");
     printf("%s\n",buffer);
-    return 0;
     
+     }
+     return 0;
 }
 
