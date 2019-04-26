@@ -54,7 +54,7 @@ char buffer[256];
         write(STDOUT_FILENO, "Please enter the message: ", sizeof("Please enter the message: "));
      bzero(buffer,256);
     read(STDIN_FILENO,buffer,255);
-    if(strcmp(buffer,"exit")==0){
+    if(strcmp(buffer,"exit\n")==0){
          write(STDOUT_FILENO, "Exiting...", 10);
          exit(0);
     }
@@ -70,4 +70,3 @@ char buffer[256];
      }
      return 0;
 }
-
