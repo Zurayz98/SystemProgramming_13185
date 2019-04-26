@@ -224,6 +224,47 @@ else if(strcmp(tok, "list")==0){//FIX IT -- DO THIS ON CLIENT END
 else if(strcmp(tok, "exit")==0){
         write(STDOUT_FILENO, "Client left", 11);
 }
+else if(strcmp(tok, "msg")==0){
+        tok = strtok(NULL, " ");
+        char *substr;
+        char buffr[MAX_LIMIT];
+        int n = sprintf(buffr, "%s", tok);
+        tok = strtok(NULL, " ");
+        int len = n;
+        while(tok!=NULL){
+                n=sprintf(substr, "%s", tok);
+                len += n;
+                strcat(buffr,substr);
+                tok = strtok(NULL, " ");
+        }
+        
+        write(sock,buffr, len);
+}
+else if(strcmp(tok, "kill")==0){
+        char buff[MAX_LIMIT];
+        int n;
+        tok = strtok(NULL, " ");
+        int kpid = atoi(tok);
+        int ret = kill(kpid,SIGKILL);
+        if(ret<0){
+        n = sprintf(buff, "Unsuccessful kill");
+        write(sock,buff,n);
+        }
+        for(int i=0; i<plist_index; i++){
+                if(plist[i].proc_id == kpid){
+                        plist[i].isActive=false;
+                        time(&plist[plist_index].endTime);
+                }
+        }
+        n = sprintf(buff, "Process with pid: %d killed successfully", kpid);
+        write(sock,buff,n);
+        
+}
+else{
+        char buff[MAX_LIMIT];
+        int n = sprintf(buff, "INVALID COMMAND. TRY AGAIN.");
+        write(sock,buff, n);
+}
 }
 }
 
